@@ -1,0 +1,27 @@
+# Datasets (muy grandes)
+datos/originales/
+datos/procesados/
+
+# Modelos entrenados
+modelos/*.pth
+modelos/checkpoints/*.pth
+
+# Resultados
+resultados/
+
+# Python
+__pycache__/
+*.py[cod]
+.Python
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
