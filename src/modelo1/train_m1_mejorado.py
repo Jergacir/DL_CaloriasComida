@@ -15,11 +15,23 @@ import os
 from dataset import Food11Dataset
 from cnn_clasificador import CNNClasificador
 
-def entrenar_modelo1_mejorado(data_path='datos/originales/food11', num_epochs=80):
+def entrenar_modelo1_mejorado(data_path=None, num_epochs=80):
     """Entrena con más épocas y cambios de hiperparámetros"""
+    
+    # AUTODETECTAR RUTA
+    if data_path is None:
+        # Prioridad 1: Colab
+        if os.path.exists('/content/drive/MyDrive/DL_CaloriasComida/datos/originales/food11'):
+            data_path = '/content/drive/MyDrive/DL_CaloriasComida/datos/originales/food11'
+        # Prioridad 2: Local
+        elif os.path.exists('datos/originales/food11'):
+            data_path = 'datos/originales/food11'
+        else:
+            raise ValueError("No se encontró Food-11. Verifica la ruta.")
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Dispositivo: {device}")
+    print(f"📂 Datos desde: {data_path}\n")
     
     # CAMBIO 1: Aumentar batch size (mejor gradientes)
     # Transforms MÁS AGRESIVOS
