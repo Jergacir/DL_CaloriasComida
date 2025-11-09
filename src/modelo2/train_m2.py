@@ -38,8 +38,8 @@ def entrenar_modelo2(data_path=None, num_epochs=80):
         transforms.RandomRotation(20),
         transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.2),
         transforms.RandomAffine(degrees=0, translate=(0.08, 0.08)),
-        transforms.RandomErasing(p=0.25),
         transforms.ToTensor(),
+        transforms.RandomErasing(p=0.25),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
     val_transform = transforms.Compose([
