@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍽️ Sistema de Estimación de Calorías</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Fondo temático: textura sutil + degradado cálido (tonos comida) */
+            background-color: #fff7f0;
+            background-image:
+                radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px),
+                linear-gradient(135deg, #ffd89b 0%, #ff7e5f 100%);
+            background-size: 20px 20px, cover;
+            min-height: 100vh;
+            padding: 20px;
+            color: #3b2f2f;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: #5b3a2e;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .hero-plate {
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #fff 0%, #fff7ec 40%, #fff0d6 100%);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:40px;
+        }
+
+        .header h1 {
+            font-size: 2.4em;
+            font-weight: 800;
+            margin-bottom: 6px;
+            color: #3b2f2f;
+        }
+
+        .header p {
+            font-size: 1em;
+            opacity: 0.95;
+            color: #5b3a2e;
+        }
+        
+        .main-card {
+            background: #fffaf5;
+            border-radius: 20px;
+            padding: 36px;
+            box-shadow: 0 18px 45px rgba(59,47,47,0.08);
+            margin-bottom: 30px;
+            border: 1px solid rgba(91,58,46,0.06);
+        }
+        
+        .upload-section {
+            text-align: center;
+        }
+        
+        .upload-area {
+            border: 3px dashed rgba(91,58,46,0.18);
+            border-radius: 18px;
+            padding: 48px 30px;
+            cursor: pointer;
+            transition: all 0.28s ease;
+            background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,250,245,0.95));
+        }
+        
+        .upload-area:hover {
+            background: #e9ecef;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+        
+        .upload-area.dragover {
+            background: #e9ecef;
+            border-color: #764ba2;
+        }
+        
+        .upload-icon {
+            font-size: 4.2em;
+            margin-bottom: 16px;
+        }
+        
+        .upload-text {
+            font-size: 1.15em;
+            color: #4b382f;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .upload-hint {
+            font-size: 0.9em;
+            color: #8a6f61;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, #ffb86b 0%, #ff7e5f 100%);
+            color: white;
+            border: none;
+            padding: 12px 34px;
+            border-radius: 22px;
+            font-size: 1.05em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            margin-top: 18px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .results-section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 26px;
+            margin-top: 22px;
+        }
+        
+        .image-preview {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .results-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,250,245,0.98));
+            color: #5b3a2e;
+            padding: 18px 22px;
+            border-radius: 14px;
+            text-align: center;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            border: 1px solid rgba(91,58,46,0.06);
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:10px;
+        }
+
+        /* Icono pequeño dentro de cada metric-card */
+        .metric-card .icon {
+            font-size: 28px;
+            background: radial-gradient(circle at 30% 20%, rgba(255,190,120,0.3), transparent 40%);
+            padding: 8px;
+            border-radius: 10px;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .metric-label {
+            font-size: 0.85em;
+            opacity: 0.85;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 1.9em;
+            font-weight: 800;
+            color: #3b2f2f;
+        }
+        
+        .top3-section {
+            margin-top: 24px;
+            background: #fff8f3;
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid rgba(91,58,46,0.04);
+        }
+        
+        .top3-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .top3-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: linear-gradient(90deg, #fff, #fffaf6);
+            margin-bottom: 10px;
+            border-radius: 10px;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+            border: 1px solid rgba(91,58,46,0.03);
+        }
+        
+        .top3-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .top3-rank {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+            width: 40px;
+        }
+        
+        .top3-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .top3-prob {
+            font-weight: 600;
+            color: #764ba2;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #5b3a2e;
+            margin-top: 30px;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="hero-plate">🍛</div>
+            <div>
+                <h1>🍽️ Sistema de Estimación de Calorías</h1>
+                <p>Clasificación inteligente y estimación de calorías con Deep Learning</p>
+            </div>
+        </div>
+        
+        <!-- Main Card -->
+        <div class="main-card">
+            <!-- Upload Section -->
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">Sube una foto del plato</div>
+                    <div class="upload-hint">o toma una con tu cámara / haz clic para seleccionar</div>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+                <button class="btn-primary" id="analyzeBtn" style="display: none;">
+                    🔍 Analizar Imagen
+                </button>
+            </div>
+            
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analizando imagen...</p>
+            </div>
+            
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+            
+            <!-- Results Section -->
+            <div class="results-section" id="resultsSection">
+                <h2 style="text-align: center; color: #667eea; margin-bottom: 20px;">
+                    📊 Resultados del Análisis
+                </h2>
+                
+                <div class="results-grid">
+                    <!-- Image Preview -->
+                    <div class="image-preview" id="imagePreview"></div>
+                    
+                    <!-- Results Info -->
+                    <div class="results-info">
+                        <!-- Metrics -->
+                        <div class="metric-card">
+                            <div class="icon">🍽️</div>
+                            <div class="metric-label">Categoría</div>
+                            <div class="metric-value" id="categoria">-</div>
+                        </div>
+                
+                        <div class="metric-card">
+                            <div class="icon">🔎</div>
+                            <div class="metric-label">Confianza</div>
+                            <div class="metric-value" id="confianza">-</div>
+                        </div>
+                
+                        <div class="metric-card" id="caloriasCard">
+                            <div class="icon">🔥</div>
+                            <div class="metric-label">Calorías Estimadas</div>
+                            <div class="metric-value" id="calorias">-</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Top-3 -->
+                <div class="top3-section">
+                    <div class="top3-title">🏆 Top 3 Predicciones</div>
+                    <div id="top3List"></div>
+                </div>
+                
+                <!-- New Analysis Button -->
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn-primary" onclick="resetAnalysis()">
+                        🔄 Analizar Otra Imagen
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>🧠 Desarrollado por Jeremy García y Rodrigo Henckell</p>
+            <p>📚 Datasets: Food-101 y Nutrition5k</p>
+        </div>
+    </div>
+    
+    <script>
+    // Variables globales
+    let selectedFile = null;
+    // Object URL para la imagen subida (usado para preview sin pasar por backend)
+    let currentPreviewURL = null;
+        
+        // Elementos DOM
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loading = document.getElementById('loading');
+        const uploadSection = document.getElementById('uploadSection');
+        const resultsSection = document.getElementById('resultsSection');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        // Click en área de upload
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // Selección de archivo
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                selectedFile = file;
+                uploadArea.innerHTML = `
+                    <div class="upload-icon">✅</div>
+                    <div class="upload-text">Archivo seleccionado:</div>
+                    <div class="upload-hint">${file.name}</div>
+                `;
+                analyzeBtn.style.display = 'block';
+            }
+        });
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                selectedFile = file;
+                fileInput.files = e.dataTransfer.files;
+                uploadArea.innerHTML = `
+                    <div class="upload-icon">✅</div>
+                    <div class="upload-text">Archivo seleccionado:</div>
+                    <div class="upload-hint">${file.name}</div>
+                `;
+                analyzeBtn.style.display = 'block';
+            }
+        });
+        
+        // Analizar imagen
+        analyzeBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            // Crear preview local (object URL) para mostrar la imagen sin depender del backend
+            if (currentPreviewURL) {
+                URL.revokeObjectURL(currentPreviewURL);
+                currentPreviewURL = null;
+            }
+            currentPreviewURL = URL.createObjectURL(selectedFile);
+
+            // Ocultar upload, mostrar loading
+            uploadSection.style.display = 'none';
+            loading.style.display = 'block';
+            errorMessage.style.display = 'none';
+
+            // Crear FormData
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                // Hacer request
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Mostrar resultados (usar currentPreviewURL para la imagen)
+                    displayResults(data);
+                } else {
+                    // Mostrar error
+                    showError(data.error || 'Error desconocido');
+                    // Liberar preview si hubo error
+                    if (currentPreviewURL) {
+                        URL.revokeObjectURL(currentPreviewURL);
+                        currentPreviewURL = null;
+                    }
+                }
+            } catch (error) {
+                showError('Error de conexión: ' + error.message);
+                if (currentPreviewURL) {
+                    URL.revokeObjectURL(currentPreviewURL);
+                    currentPreviewURL = null;
+                }
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+        
+        // Mostrar resultados
+        function displayResults(data) {
+            const res = data.resultado;
+            const top3 = data.top3;
+            
+            // Mostrar imagen
+            const imgSrc = currentPreviewURL ? currentPreviewURL : (data.imagen_url || '');
+            document.getElementById('imagePreview').innerHTML = `
+                <img src="${imgSrc}" alt="Imagen analizada">
+            `;
+            
+            // Métricas
+            document.getElementById('categoria').textContent = res.clase;
+            document.getElementById('confianza').textContent = res.probabilidad.toFixed(1) + '%';
+            
+            if (res.calorias) {
+                document.getElementById('calorias').textContent = Math.round(res.calorias) + ' kcal';
+                document.getElementById('caloriasCard').style.display = 'block';
+            } else {
+                document.getElementById('caloriasCard').style.display = 'none';
+            }
+            
+            // Top-3
+            const top3HTML = top3.map((item, index) => `
+                <div class="top3-item">
+                    <div class="top3-rank">${index + 1}</div>
+                    <div class="top3-name">${item.clase}</div>
+                    <div class="top3-prob">${item.probabilidad.toFixed(1)}%</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('top3List').innerHTML = top3HTML;
+            
+            // Mostrar sección de resultados
+            resultsSection.style.display = 'block';
+        }
+        
+        // Mostrar error
+        function showError(message) {
+            errorMessage.textContent = '❌ ' + message;
+            errorMessage.style.display = 'block';
+            uploadSection.style.display = 'block';
+        }
+        
+        // Reset análisis
+        function resetAnalysis() {
+            selectedFile = null;
+            if (currentPreviewURL) {
+                URL.revokeObjectURL(currentPreviewURL);
+                currentPreviewURL = null;
+            }
+            fileInput.value = '';
+            analyzeBtn.style.display = 'none';
+            resultsSection.style.display = 'none';
+            uploadSection.style.display = 'block';
+            errorMessage.style.display = 'none';
+            
+            uploadArea.innerHTML = `
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">Arrastra una imagen aquí</div>
+                <div class="upload-hint">o haz clic para seleccionar</div>
+            `;
+        }
+    </script>
+</body>
+</html>

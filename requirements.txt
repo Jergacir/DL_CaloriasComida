@@ -13,3 +13,5 @@ tqdm>=4.65.0
 pyyaml>=6.0
 jupyter>=1.0.0
 kaggle
+streamlit>=1.28.0      # Para Streamlit
+flask>=2.3.0           # Para Flask
