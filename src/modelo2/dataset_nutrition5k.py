@@ -50,7 +50,7 @@ class Nutrition5kDataset(Dataset):
     def __getitem__(self, idx):
         row = self.images_df.iloc[idx]
         dish_id = row['dish']
-        img_bytes = row['image']
+        img_bytes = row['rgb_image']
         image = Image.open(io.BytesIO(img_bytes)).convert('RGB')
         calories = self.calorie_map[dish_id]
         if self.transform:
