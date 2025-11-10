@@ -5,6 +5,7 @@ datos/procesados/
 # Modelos entrenados
 modelos/*.pth
 modelos/checkpoints/*.pth
+app/static/uploads
 
 # Resultados
 resultados/

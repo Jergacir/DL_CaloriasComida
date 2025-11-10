@@ -27,7 +27,10 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 # ═══════════════════════════════════════════════════════════
@@ -40,13 +43,25 @@ MODELO2_PATH = os.path.join(os.path.dirname(__file__), '..', 'modelos', 'modelo2
 logger.info("🚀 Inicializando sistema...")
 
 try:
+    # Verificar existencia de modelos
+    if not os.path.exists(MODELO1_PATH):
+        raise FileNotFoundError(f"Modelo 1 no encontrado: {MODELO1_PATH}")
+    
+    modelo2_existe = os.path.exists(MODELO2_PATH)
+    if not modelo2_existe:
+        logger.warning(f"⚠️  Modelo 2 no encontrado: {MODELO2_PATH}")
+        logger.warning("⚠️  Solo se cargará clasificación (sin estimación de calorías)")
+    
     sistema = SistemaCaloriasComida(
         MODELO1_PATH, 
-        MODELO2_PATH if os.path.exists(MODELO2_PATH) else None
+        MODELO2_PATH if modelo2_existe else None,
+        device='auto'  # Auto-detecta GPU o CPU
     )
     logger.info("✅ Modelos cargados exitosamente")
+    
 except Exception as e:
     logger.error(f"❌ Error al cargar modelos: {e}")
+    logger.error("💡 Verifica que los archivos .pth existan en la carpeta 'modelos/'")
     sistema = None
 
 # ═══════════════════════════════════════════════════════════
@@ -75,7 +90,7 @@ def predict():
     if sistema is None:
         return jsonify({
             'success': False,
-            'error': 'Modelos no cargados. Verifica que existan los archivos .pth'
+            'error': 'Modelos no cargados. Verifica que existan los archivos .pth en la carpeta "modelos/"'
         }), 500
     
     # Validar que hay archivo
@@ -101,6 +116,7 @@ def predict():
             'error': 'Formato de archivo no permitido. Usa: jpg, jpeg, png, gif'
         }), 400
     
+    filepath = None
     try:
         # Guardar archivo con timestamp único
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -119,7 +135,7 @@ def predict():
         
         logger.info(f"✅ Predicción: {resultado['clase']} ({resultado['probabilidad']:.1f}%)")
         
-        # Retornar resultado (mantener imagen para mostrar)
+        # Retornar resultado
         return jsonify({
             'success': True,
             'resultado': resultado,
@@ -128,11 +144,14 @@ def predict():
         })
     
     except Exception as e:
-        logger.error(f"❌ Error en predicción: {e}")
+        logger.error(f"❌ Error en predicción: {e}", exc_info=True)
         
         # Limpiar archivo si hay error
-        if os.path.exists(filepath):
-            os.remove(filepath)
+        if filepath and os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except:
+                pass
         
         return jsonify({
             'success': False,
@@ -163,8 +182,9 @@ def info():
 def health():
     """Health check para deployment"""
     return jsonify({
-        'status': 'healthy',
-        'sistema_cargado': sistema is not None
+        'status': 'healthy' if sistema is not None else 'unhealthy',
+        'sistema_cargado': sistema is not None,
+        'timestamp': datetime.now().isoformat()
     })
 
 @app.route('/static/uploads/<filename>')
@@ -192,7 +212,7 @@ def not_found(error):
 @app.errorhandler(500)
 def internal_error(error):
     """Error 500"""
-    logger.error(f"Error 500: {error}")
+    logger.error(f"Error 500: {error}", exc_info=True)
     return jsonify({
         'success': False,
         'error': 'Error interno del servidor'
@@ -203,6 +223,11 @@ def internal_error(error):
 # ═══════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
+    if sistema is None:
+        logger.error("❌ No se pudo iniciar el servidor: modelos no cargados")
+        logger.error("💡 Verifica que los archivos .pth existan en 'modelos/'")
+        exit(1)
+    
     logger.info("🌐 Iniciando servidor Flask...")
     logger.info("📍 Abre tu navegador en: http://localhost:5000")
     

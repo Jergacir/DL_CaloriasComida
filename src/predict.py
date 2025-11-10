@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # ═══════════════════════════════════════════════════════════
 # src/predict.py
 # Script de línea de comandos para predicción
@@ -7,7 +8,6 @@
 import argparse
 import os
 from inference import SistemaCaloriasComida
-
 
 def main():
     parser = argparse.ArgumentParser(
@@ -20,25 +20,25 @@ Ejemplos de uso:
   
   # Predicción completa (clasificación + calorías)
   python predict.py --imagen foto.jpg \\
-                    --modelo1 modelos/modelo1_mejor.pth \\
-                    --modelo2 modelos/modelo2_mejor.pth
+    --modelo1 modelos/modelo1_mejor.pth \\
+    --modelo2 modelos/modelo2_mejor.pth
   
   # Top-3 predicciones
   python predict.py --imagen foto.jpg --modelo1 modelos/modelo1_mejor.pth --top 3
-        """
+"""
     )
     
     parser.add_argument('--imagen', type=str, required=True,
-                        help='Path a la imagen de comida')
+                       help='Path a la imagen de comida')
     parser.add_argument('--modelo1', type=str, required=True,
-                        help='Path al modelo de clasificación (.pth)')
+                       help='Path al modelo de clasificación (.pth)')
     parser.add_argument('--modelo2', type=str, default=None,
-                        help='Path al modelo de regresión (.pth) [opcional]')
+                       help='Path al modelo de regresión (.pth) [opcional]')
     parser.add_argument('--top', type=int, default=1,
-                        help='Mostrar top-k predicciones (default: 1)')
+                       help='Mostrar top-k predicciones (default: 1)')
     parser.add_argument('--device', type=str, default='auto',
-                        choices=['auto', 'cuda', 'cpu'],
-                        help='Dispositivo de cómputo (default: auto)')
+                       choices=['auto', 'cuda', 'cpu'],
+                       help='Dispositivo de cómputo (default: auto)')
     
     args = parser.parse_args()
     
@@ -65,14 +65,12 @@ Ejemplos de uso:
         print(f"🏆 TOP-{args.top} PREDICCIONES")
         print("="*70)
         for i, res in enumerate(resultados, 1):
-            print(f"{i}. {res['clase']:<20} {res['probabilidad']:>6.2f}%")
+            print(f"{i}. {res['clase']:<30} {res['probabilidad']:>6.2f}%")
         print("="*70)
     else:
         # Predicción simple
         resultado = sistema.predecir(args.imagen)
-    
-    print("\n✅ Predicción completada")
-
+        # El resultado ya se muestra con verbose=True por defecto
 
 if __name__ == '__main__':
     main()
