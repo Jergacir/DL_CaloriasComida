@@ -12,6 +12,120 @@ from torchvision import transforms
 import warnings
 warnings.filterwarnings('ignore')
 
+# ═══════════════════════════════════════════════════════════
+# Diccionario de traducción inglés -> español
+# ═══════════════════════════════════════════════════════════
+
+FOOD_TRANSLATIONS = {
+    'apple_pie': 'Tarta de manzana',
+    'baby_back_ribs': 'Costillas de cerdo',
+    'baklava': 'Baklava',
+    'beef_carpaccio': 'Carpaccio de res',
+    'beef_tartare': 'Tartar de res',
+    'beet_salad': 'Ensalada de remolacha',
+    'beignets': 'Buñuelos',
+    'bibimbap': 'Bibimbap',
+    'bread_pudding': 'Budín de pan',
+    'breakfast_burrito': 'Burrito de desayuno',
+    'bruschetta': 'Bruschetta',
+    'caesar_salad': 'Ensalada César',
+    'cannoli': 'Cannoli',
+    'caprese_salad': 'Ensalada Caprese',
+    'carrot_cake': 'Pastel de zanahoria',
+    'ceviche': 'Ceviche',
+    'cheese_plate': 'Tabla de quesos',
+    'cheesecake': 'Pastel de queso',
+    'chicken_curry': 'Curry de pollo',
+    'chicken_quesadilla': 'Quesadilla de pollo',
+    'chicken_wings': 'Alitas de pollo',
+    'chocolate_cake': 'Pastel de chocolate',
+    'chocolate_mousse': 'Mousse de chocolate',
+    'churros': 'Churros',
+    'clam_chowder': 'Sopa de almejas',
+    'club_sandwich': 'Sándwich club',
+    'crab_cakes': 'Pasteles de cangrejo',
+    'creme_brulee': 'Crème brûlée',
+    'croque_madame': 'Croque madame',
+    'cup_cakes': 'Cupcakes',
+    'deviled_eggs': 'Huevos endiablados',
+    'donuts': 'Donas',
+    'dumplings': 'Dumplings',
+    'edamame': 'Edamame',
+    'eggs_benedict': 'Huevos benedictinos',
+    'escargots': 'Caracoles',
+    'falafel': 'Falafel',
+    'filet_mignon': 'Filete mignon',
+    'fish_and_chips': 'Pescado con papas fritas',
+    'foie_gras': 'Foie gras',
+    'french_fries': 'Papas fritas',
+    'french_onion_soup': 'Sopa de cebolla francesa',
+    'french_toast': 'Tostadas francesas',
+    'fried_calamari': 'Calamares fritos',
+    'fried_rice': 'Arroz frito',
+    'frozen_yogurt': 'Yogurt helado',
+    'garlic_bread': 'Pan de ajo',
+    'gnocchi': 'Ñoquis',
+    'greek_salad': 'Ensalada griega',
+    'grilled_cheese_sandwich': 'Sándwich de queso asado',
+    'grilled_salmon': 'Salmón a la parrilla',
+    'guacamole': 'Guacamole',
+    'gyoza': 'Gyoza',
+    'hamburger': 'Hamburguesa',
+    'hot_and_sour_soup': 'Sopa agria y picante',
+    'hot_dog': 'Hot dog',
+    'huevos_rancheros': 'Huevos rancheros',
+    'hummus': 'Hummus',
+    'ice_cream': 'Helado',
+    'lasagna': 'Lasaña',
+    'lobster_bisque': 'Bisque de langosta',
+    'lobster_roll_sandwich': 'Sándwich de langosta',
+    'macaroni_and_cheese': 'Macarrones con queso',
+    'macarons': 'Macarons',
+    'miso_soup': 'Sopa de miso',
+    'mussels': 'Mejillones',
+    'nachos': 'Nachos',
+    'omelette': 'Omelette',
+    'onion_rings': 'Aros de cebolla',
+    'oysters': 'Ostras',
+    'pad_thai': 'Pad Thai',
+    'paella': 'Paella',
+    'pancakes': 'Panqueques',
+    'panna_cotta': 'Panna cotta',
+    'peking_duck': 'Pato pequinés',
+    'pho': 'Pho',
+    'pizza': 'Pizza',
+    'pork_chop': 'Chuleta de cerdo',
+    'poutine': 'Poutine',
+    'prime_rib': 'Costilla de res',
+    'pulled_pork_sandwich': 'Sándwich de cerdo desmechado',
+    'ramen': 'Ramen',
+    'ravioli': 'Ravioli',
+    'red_velvet_cake': 'Pastel red velvet',
+    'risotto': 'Risotto',
+    'samosa': 'Samosa',
+    'sashimi': 'Sashimi',
+    'scallops': 'Vieiras',
+    'seaweed_salad': 'Ensalada de algas',
+    'shrimp_and_grits': 'Camarones con grits',
+    'spaghetti_bolognese': 'Espagueti a la boloñesa',
+    'spaghetti_carbonara': 'Espagueti carbonara',
+    'spring_rolls': 'Rollitos primavera',
+    'steak': 'Bistec',
+    'strawberry_shortcake': 'Pastel de fresa',
+    'sushi': 'Sushi',
+    'tacos': 'Tacos',
+    'takoyaki': 'Takoyaki',
+    'tiramisu': 'Tiramisú',
+    'tuna_tartare': 'Tartar de atún',
+    'waffles': 'Waffles'
+}
+
+
+def translate_food_name(english_name):
+    """Traduce nombre de comida de inglés a español"""
+    return FOOD_TRANSLATIONS.get(english_name, english_name.replace('_', ' ').title())
+
+
 # Agregar rutas de modelos
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'modelo1'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'modelo2'))
@@ -153,6 +267,7 @@ class SistemaCaloriasComida:
             
             clase_id = pred_clase.item()
             clase_nombre = self.CLASES.get(clase_id, f"Clase_{clase_id}")
+            clase_nombre_es = translate_food_name(clase_nombre)
             probabilidad = prob_max.item()
             
             # Modelo 2: Calorías (si está disponible)
@@ -167,7 +282,8 @@ class SistemaCaloriasComida:
                     calorias = calorias_norm
         
         resultado = {
-            'clase': clase_nombre,
+            'clase': clase_nombre_es,
+            'clase_original': clase_nombre,
             'clase_id': clase_id,
             'probabilidad': round(probabilidad * 100, 2),
             'calorias': round(calorias, 1) if calorias else None
@@ -232,8 +348,11 @@ class SistemaCaloriasComida:
         
         resultados = []
         for prob, idx in zip(top_probs, top_indices):
+            clase_nombre = self.CLASES.get(idx.item(), f"Clase_{idx.item()}")
+            clase_nombre_es = translate_food_name(clase_nombre)
             resultados.append({
-                'clase': self.CLASES.get(idx.item(), f"Clase_{idx.item()}"),
+                'clase': clase_nombre_es,
+                'clase_original': clase_nombre,
                 'probabilidad': round(prob.item() * 100, 2)
             })
         
