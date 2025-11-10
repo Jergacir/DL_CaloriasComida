@@ -113,7 +113,7 @@ def entrenar_modelo2(data_path=None, num_epochs=80):
         val_mae /= len(val_loader)
         print(f"  🧪 Val:   Loss={val_loss:.4f} | MAE={val_mae:.2f} kcal")
 
-        scheduler.step(val_loss)
+        #scheduler.step(val_loss)
         history['train_loss'].append(train_loss)
         history['train_mae'].append(train_mae)
         history['val_loss'].append(val_loss)
