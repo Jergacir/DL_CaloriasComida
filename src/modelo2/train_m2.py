@@ -10,6 +10,8 @@ from dataset_nutrition5k import Nutrition5kDataset
 from cnn_regressor import CNNRegressor
 import numpy as np
 import datetime
+from torch.optim.lr_scheduler import OneCycleLR
+
 
 def entrenar_modelo2(data_path=None, num_epochs=80):
     """
@@ -33,14 +35,10 @@ def entrenar_modelo2(data_path=None, num_epochs=80):
 
     # Augmentations mejorados
     train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
+        transforms.RandomResizedCrop(224, scale=(0.9, 1.0)),
         transforms.RandomHorizontalFlip(p=0.5),
-        transforms.RandomRotation(20),
-        transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.2),
-        transforms.RandomAffine(degrees=0, translate=(0.08, 0.08)),
         transforms.ToTensor(),
-        transforms.RandomErasing(p=0.25),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        transforms.Normalize([0.485,0.456,0.406], [0.229,0.224,0.225])
     ])
     val_transform = transforms.Compose([
         transforms.Resize((224, 224)),
@@ -64,8 +62,8 @@ def entrenar_modelo2(data_path=None, num_epochs=80):
     print(f"\n🧠 Modelo CNN creado. Total parámetros: {total_params:,}\n")
 
     criterion = nn.SmoothL1Loss()
-    optimizer = optim.AdamW(modelo.parameters(), lr=0.001, weight_decay=1e-4)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', patience=7, factor=0.3, min_lr=1e-5)
+    optimizer = optim.AdamW(modelo.parameters(), lr=4e-4, weight_decay=1e-4)
+    scheduler = OneCycleLR(optimizer, max_lr=4e-4, steps_per_epoch=len(train_loader), epochs=num_epochs)
     patience = 20
     min_val_mae = float('inf')
     epochs_no_improve = 0
@@ -83,6 +81,7 @@ def entrenar_modelo2(data_path=None, num_epochs=80):
             loss = criterion(outputs, calories)
             loss.backward()
             optimizer.step()
+            scheduler.step()
             # MAE denormalizado
             outputs_denorm = outputs * std_cal + mean_cal
             calories_denorm = calories * std_cal + mean_cal
