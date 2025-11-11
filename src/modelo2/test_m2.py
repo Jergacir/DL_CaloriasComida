@@ -44,5 +44,5 @@ def test_model(data_path, model_path):
 if __name__ == '__main__':
     # Actualiza la ruta según tu carpeta de datos y el archivo del modelo guardado
     data_path = '/content/drive/MyDrive/DL_CaloriasComida/datos/originales/nutrition5k'
-    model_path = 'modelos/modelo2_mejor.pth'
+    model_path = '/content/drive/MyDrive/DL_CaloriasComida/modelos/modelo2_mejor.pth'
     test_model(data_path, model_path)
