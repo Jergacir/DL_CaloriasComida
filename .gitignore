@@ -8,7 +8,7 @@ modelos/checkpoints/*.pth
 app/static/uploads
 
 # Resultados
-resultados/
+# resultados/
 
 # Python
 __pycache__/
