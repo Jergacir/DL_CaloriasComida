@@ -1,59 +1,11 @@
 DL_CaloriasComida/
 │
-├── datos/
-│   ├── originales/                    # No tocar, backup
-│   │   ├── food11/
-│   │   │   └── training/
-│   │   │       ├── Bread/
-│   │   │       ├── Dairy/
-│   │   │       └── ... (11 clases)
-│   │   │
-│   │   └── nutrition5k/
-│   │       ├── imagery/
-│   │       │   └── realsense_overhead/
-│   │       │       ├── dish_0001/
-│   │       │       │   ├── rgb.png
-│   │       │       │   └── depth_raw.png
-│   │       │       └── ...
-│   │       └── metadata/
-│   │           ├── dish_metadata_cafe1.csv
-│   │           └── dish_metadata_cafe2.csv
-│   │
-│   └── procesados/                    # Tu área de trabajo
-│       ├── food11/                    # Dataset para Modelo 1
-│       │   ├── entrenamiento/         # 70% (~11,600 imgs)
-│       │   │   ├── Bread/
-│       │   │   ├── Dairy/
-│       │   │   └── ... (11 clases)
-│       │   ├── validacion/            # 15% (~2,500 imgs)
-│       │   │   ├── Bread/
-│       │   │   └── ...
-│       │   └── prueba/                # 15% (~2,500 imgs)
-│       │       ├── Bread/
-│       │       └── ...
-│       │
-│       └── nutrition5k/               # Dataset para Modelo 2
-│           ├── entrenamiento/         # 70% (~3,500 platos)
-│           │   ├── metadata.csv
-│           │   └── dish_XXXX/
-│           │       ├── rgb.png
-│           │       └── depth_raw.png
-│           ├── validacion/            # 15% (~750 platos)
-│           │   ├── metadata.csv
-│           │   └── dish_XXXX/
-│           └── prueba/                # 15% (~750 platos)
-│               ├── metadata.csv
-│               └── dish_XXXX/
-│
 ├── notebooks/
-│   ├── 01_exploracion.ipynb
-│   ├── 02_modelo1_clasificador.ipynb
-│   ├── 03_modelo2_regresion.ipynb
-│   └── 04_integracion_final.ipynb
+│   ├── Modelo1_Resnet50.ipynb
+│   └── Modelo2_Prediccion.ipynb
 │
 ├── src/
 │   ├── __init__.py
-│   ├── configuracion.py
 │   │
 │   ├── modelo1/                       # Clasificador
 │   │   ├── __init__.py
@@ -71,33 +23,19 @@ DL_CaloriasComida/
 │   ├── evaluate.py
 │   └── utils.py
 │
-├── scripts/                           # ← AGREGAR ESTA CARPETA
-│   ├── dividir_datasets.py            # Script para crear splits
-│   ├── verificar_datos.py             # Verificar integridad de datos
-│   └── descargar_datasets.sh          # (opcional) Script de descarga
-│
 ├── modelos/                           # Modelos guardados
-│   ├── checkpoints/                   # Checkpoints durante entrenamiento
-│   │   ├── modelo1_epoch_10.pth
-│   │   ├── modelo1_epoch_20.pth
-│   │   ├── modelo2_epoch_10.pth
-│   │   └── modelo2_epoch_20.pth
 │   ├── modelo1_clasificador.pth       # Mejor modelo 1
 │   └── modelo2_calorias.pth           # Mejor modelo 2
 │
 ├── resultados/                        # Resultados y métricas
 │   ├── modelo1/
-│   │   ├── graficas/
-│   │   ├── metricas.json
-│   │   └── confusion_matrix.png
-│   ├── modelo2/
-│   │   ├── graficas/
+│   │    ├── graficas/
 │   │   └── metricas.json
-│   └── sistema_completo/
-│       ├── comparacion.csv
-│       └── ejemplos_predicciones/
+│   │   
+│   └── modelo2/
+│       ├── graficas/
+│       └── metricas.json
 │
 ├── requirements.txt
-├── README.md
 ├── .gitignore                         
 └── main.py
