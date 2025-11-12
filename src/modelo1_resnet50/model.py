@@ -24,17 +24,19 @@ class ResNet50Food101(nn.Module):
         # Reemplazar última capa
         num_features = self.resnet.fc.in_features
         self.resnet.fc = nn.Sequential(
-            nn.Dropout(0.5),
-            nn.Linear(num_features, 512),
-            nn.ReLU(),
-            nn.BatchNorm1d(512),
-            nn.Dropout(0.3),
-            nn.Linear(512, num_classes)
+            nn.Dropout(0.5), # Apagar aleatoriamente 50% de las neuronas
+            nn.Linear(num_features, 512), # Capa densa: 2048 → 512
+            nn.ReLU(), # Función de activación
+            nn.BatchNorm1d(512), # Normalización de valores para estabilizar entrenamiento
+            nn.Dropout(0.3), 
+            nn.Linear(512, num_classes) # Capa final: 512 → 101
         )
     
+    # Toma una imagen → pasa por ResNet50 completo → devuelve predicciones
     def forward(self, x):
         return self.resnet(x)
     
+    # Descongela todas las capas
     def unfreeze(self):
         """Descongela todas las capas para fine-tuning"""
         for param in self.resnet.parameters():
